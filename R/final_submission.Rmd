@@ -111,7 +111,7 @@ The standardised death rate available in this provided dataset is the standard r
 abs_remote_long %>%
     filter(state %in% c("Queensland","Australia"), measure == "Standardised death rate", year >= 2013) %>%
     ggplot(aes(x=remoteness, y=value, fill=state)) +
-    stat_summary(fun.y="mean", geom="col", width=0.7, position=position_dodge()) +
+    stat_summary(fun="mean", geom="col", width=0.7, position=position_dodge()) +
     stat_summary(fun.data = mean_se, geom = "errorbar", width=0.5, position=position_dodge(width=0.7)) +
     xlab("Remoteness") +
     ylab("Mean Standardised Death Rate") +
