@@ -105,7 +105,7 @@ head(abs_remote_long)
 
 ### Interpretation
 
-The standardised death rate available in this provided dataset is the standard reporting measure used by the ABS for reporting trends in Deaths (see https://www.abs.gov.au/statistics/people/population/deaths-australia/latest-release ), which takes into account a standardised population in the reporting area (as at 2001). As all deaths are considered in this measure, it is the most appropriate to use for a general comparison over time and region. Figure 1 below presents the mean of all standardised death rates for the period 2013-2024, by ABS Remoteness Area (ARIA), for both Australia overall and Queensland separately. 
+The standardised death rate available in this provided dataset is the standard reporting measure used by the ABS for reporting trends in Deaths (see https://www.abs.gov.au/statistics/people/population/deaths-australia/latest-release ), which takes into account a standardised baseline population in the reporting area (as at 2001). As all deaths are considered in this measure, it is the most appropriate to use for a general comparison over time and region. Figure 1 below presents the mean of all standardised death rates for the period 2013-2024, by ABS Remoteness Area (ARIA), for both Australia overall and Queensland separately.
 
 ```{r, fig.dim=c(8, 4), fig.cap="***Figure 1***: *Mean Standardised Death Rate by Remoteness, 2013-2024, Queensland and Australia*"}
 abs_remote_long %>%
@@ -119,7 +119,7 @@ abs_remote_long %>%
     theme_bw()
 ```
 
-There is a general pattern that standardised death rates increase as the level of remoteness increases, and this pattern holds true for both Australia as a whole and Queensland individually across the available data. There is not significant variation in rates contributing to each mean value. While death rates in more urban Remoteness Areas (Major Cities, Inner Regional, Outer Regional) appear to be roughly comparable between Queensland and Australia, the standardised death rate in Remote, and particularly Very Remote regions for Australia as a whole appears higher than the rate for Queensland. Figure 2 expands on the overall analysis shown in Figure 1. It presents the standardised death rates for both Australia and Queensland for the period 2013-2024, with the individual values for each Remoteness Area presented as a time-series. 
+There is a general pattern that standardised death rates increase as the level of remoteness increases, and this pattern holds true for both Australia as a whole and Queensland individually across the available data. There is not significant variation in rates over time which contribute to each mean value. While death rates in more urban Remoteness Areas (Major Cities, Inner Regional, Outer Regional) appear to be roughly comparable between Queensland and Australia, the standardised death rate in Remote, and particularly Very Remote regions for Australia as a whole appears higher than the rate for Queensland. Figure 2 expands on the overall analysis shown in Figure 1. It presents the standardised death rates for both Australia and Queensland for the period 2013-2024, with the individual values for each Remoteness Area presented as a time-series. 
 
 ```{r, fig.dim=c(10,5), fig.cap="***Figure 2***: *Standardised Death Rate by Remoteness and Year, 2013-2024, Queensland and Australia*"}
 abs_remote_long %>%
@@ -142,13 +142,13 @@ Figure 2 confirms the consistency of the pattern from Figure 1 that standardised
 
 The current import script has a number of weaknesses. The row, column, and content data ranges are hard-coded at the top of the script. While this allows for relatively simple adjustment in the future in only one location, formatting changes to the Excel file would require these to be manually checked against the structure of an updated file. There may be a possibility of using other packages (e.g. `tidyxl`) which allow for importing xlsx formatting information, to infer data and dimension names directly without human intervetion.
 
-The colnames assignment should be relatively robust in general, though the use of a text delimiter to later split out the components may be more appropriately addressed by using a formal list(...) of the different heading levels. This would reduce the risk of the unlikely inclusion of the delimiter breaking the entire logic of this code section.
+The colnames assignment should be relatively robust in general, though the use of a text delimiter to later split out the components may be error-prone. The managment of these different heading levels may be more appropriately addressed by using a formal list(...) of the nested headings, which can be later merged into the final long file. This would reduce the risk of the unlikely inclusion of the delimiter in a header cell breaking the entire logic of this code section.
 
-The rownames assignment likewise relies on blank/NA values in the content data to determine state break-points. This could easily be broken by the removal of white-space in the formatting of the Excel sheet, and the pattern in the row label's 'Total' values may serve as a less-likely-to-break point of reference.
+The rownames assignment likewise relies on blank/NA values in the content data to determine state break-points. This could easily be broken by the removal of white-space in the formatting of the Excel sheet, and using another pattern in the row label's values may serve as a less-likely-to-break point of reference.
 
-The handling of all data as text initially is also a possible point of failure due to potential loss of precision during import. Ways to import each cell of data individually without altering its content may be worth considering. Again, the `tidyxl` package may support this functionality, albeit at the cost of losing some simplicity in importing the data.
+The handling of all data as text initially is also a possible point of failure due to potential loss of precision during import. Methods to import each cell of data individually without altering its content may be worth considering. Again, the `tidyxl` package may support this functionality, albeit at the cost of losing some simplicity in the importing process.
 
-Ultimately, looking for alternative solutions rather than working with poorly-structured spreadsheets may be more appropriate in the long-term. The ABS is now offering an API to some datasets (https://www.abs.gov.au/about/data-services/application-programming-interfaces-apis/data-api-user-guide/using-api), and this may be investigated to see if it is workable for this particular data source.
+Finding alternative data-access solutions rather than working with poorly-structured spreadsheets may be more appropriate in the long-term. The ABS is now offering an API to some datasets (https://www.abs.gov.au/about/data-services/application-programming-interfaces-apis/data-api-user-guide/using-api), and this may be investigated to see if it is workable for this particular data source.
 
 
 ## TASK TWO – Function Writing & Code Quality
@@ -190,7 +190,7 @@ remote_to_factor_data <- function(
     } else if(!(is.logical(ordered) && length(ordered) == 1)) {
         stop("An ordered= argument of a logical (TRUE/FALSE) vector of length 1 must be provided.")
     }
-   ## output the new variable and return the modified data
+    ## output the new variable and return the modified data
     data[[outvar]] <- factor(data[[var]], levels=remote_levels, ordered=ordered)
     data
 }
@@ -299,7 +299,7 @@ Only a formal look-up table of standard Local Government Area (LGA) codes as ava
 
 The fact that the `patient` table and `facility` tables both record an LGA which can be associated with an event is likely not a contradiction. Typically databases with this structure for hospital admissions data would record the patient LGA of their usual residence, while the facility LGA represents the physical location of the hospital where care was provided.
 
-The structure of this admissions data has several implications for reporting. Presenting counts or rates by either `facillity` or `patient` LGA would ignore any LGAs which are not represented in the `patient` or `facility` tables. e.g. - reporting on rates of a rare condition by population would not correctly consider LGAs which have no reported cases. LGA values which are not frequently occurring, or which appear to not be formatted similarly to other values in the set, should be scrutinised to ensure they have been accurately recorded. Ideally, (outer) joins against an appropriately-sourced reference table of LGAs should be included as part of a workflow for any analyses using this database, so that a full and accurate set of LGAs which could possibly be represented are considered.
+The structure of this admissions data has several implications for reporting. Presenting counts or rates by either `facillity` or `patient` LGA would ignore any LGAs which are not represented in the `patient` or `facility` tables. e.g. - reporting on rates of a rare condition by population would not correctly consider LGAs which have no reported cases. LGA values which are not frequently occurring, or which appear to not be formatted similarly to other values in the database, should be scrutinised to ensure they have been accurately recorded. Ideally, (outer) joins against an appropriately-sourced reference table of LGAs should be included as part of a workflow for any analyses using this database, so that a full and accurate set of LGAs which could possibly be represented are considered.
 
 
 <ul>*Q2. An epidemiologist who runs queries against this database to filter admissions by admission_date reports to you that her queries are running slowly on a table with 5 million rows. What could you do to speed up these queries and why?*</ul>
@@ -314,7 +314,7 @@ The `admission` table presumably contains a single row for each admission, inclu
 
 The database tables are described as representative of that in a '*state health department*', presumably Queensland in this case. When joining to the facility table, the join criteria should not only consider the match between the foreign_key-to-primary_key on `facility_id`, but also limiting the join on the `state` variable, the existence of which suggests that the `facility` table may include records for other states which may share the same `facility_id` as Queensland-based facilities. All joins from the admission table to facility table should initially be left/outer joins, to account for the potential circumstance of errors in recording of a `facility_id` in the admission table, or actual facilities that may not be represented in the facility table for whatever reason (e.g. an out of date reference table).
 
-Once a satisfactory join can be establised between the `admission` and `facility` tables, a simple count can be selected where the `admission.admission_date` occurred in 2023, and the associated `facility.remoteness` was 'Very Remote.'
+Once a satisfactory join can be establised between the `admission` and `facility` tables, a simple count query can be executed where the `admission.admission_date` occurred in 2023, and the associated `facility.remoteness` was 'Very Remote.'
 
 
 ## TASK FOUR – Git / Bash / SysAdmin
@@ -331,7 +331,7 @@ Once a satisfactory join can be establised between the `admission` and `facility
 
 *They run git commit -m "update cleaning script" immediately. What happens?*</ul>
 
-The `new_file.csv` file which is not being tracked for version control will be ignored entirely, as it is not part of the git repository at all.
+The `new_file.csv` file which is not being tracked for version control will be ignored entirely, as it is not part of the git repository.
 The modified `R/clean.R` file, which appears to be the target of the `git commit` call, given the related `"update cleaning script"` commit message, will not have its changes committed to the git repository. Other changes which were staged for commit may be committed to the repository (though it looks like there are none currently), but not the intended file.
 
 
@@ -342,24 +342,20 @@ Merging the `main` branch against the working `new-plot` branch will attempt to 
 
 <ul>*Q3. You are one of three data scientists collaborating on an analytical pipeline in a shared GitHub repository. Describe the branching and pull request workflow you would follow to add a new feature (e.g. a new visualisation function in R/plots.R) without disrupting your colleagues’ work on main.*</ul>
 
-A typicaly workflow for this scenario would be:
+A typical workflow for this scenario would be:
 - make a new `working` branch to hold the code to be edited for R/plots.R
-- fetch and merge the existing code from `main` into the `working` branch so you have a clean, up-to-date and agreed codebase to build upon.
+- pull the existing code from `main` into the `working` branch so you have a clean, up-to-date and agreed codebase to build upon.
 - make changes to the `working` branch code and commit them regularly to the `working` branch.
-- repeat the fetch and merge from `main` regularly to ensure any code conflicts can be resolved while developing.
+- repeat the pull from `main` regularly to ensure any code conflicts can be resolved while developing.
 - when significant work has been undertaken and the local `working` code is ready to be potentially merged back to `main`, push the `working` branch back to the remote repository
-- raise a pull request so that the `working` branch code can be reviewed by the other team members before being rejected, returned for further editing, or merged into the `main` branch
+- raise a pull request so that the `working` branch code can be reviewed by the other team members before being rejected, returned for further editing, or ultimately merged into the `main` branch
 
 
 <ul>*Q4. A colleague has accidentally committed a file containing a database password (config/db_credentials.R) and pushed it to the remote main branch. Describe the steps you would take to remediate this situation.*</ul>
 
-I am not confident outlining a full solution to this problem that would 100% resolve security concerns.
-I would first consider any associated credentials included in `db_credentials.R` to be potentially compromised, and arrange to change all passwords.
-Then I would take a full local `git clone` backup of the remote repository (possibly stored in several locations) to ensure no data is lost.
-All members of the team who may be currently working on code to eventually be integrated to the `main` branch should be notified to temporarily pause any planned code merges, to prevent possible future issues.
-I understand that simply removing the file and pushing the changes to the remote main branch would only obscure the credentials within the commit history of the remote repository, and a wider-ranging response would be required. From my research, the git project explicitly recommends using `git filter-repo` as listed here on the official documentation - https://git-scm.com/docs/git-filter-branch#_warning .
+If the remote branch is accessible by many users, I would consider any associated credentials included in `db_credentials.R` to be potentially compromised, and arrange to change all passwords. A full local `git clone` backup of the remote repository should be made to ensure no data is lost from resolving the issue. All members of the team who may be currently working on code to eventually be integrated to the `main` branch should be notified to temporarily pause any planned code merges, to prevent further issues. As simply removing the file and pushing the changes to the remote main branch would only obscure the credentials within the commit history of the remote repository, a wider-ranging response would be required. The Git maintainers and Github both recommend using `git filter-repo`.
 
-There are tutorials available online ( https://www.tutorialpedia.org/blog/how-to-remove-file-from-git-history/ ) which walk through the process to explicitly remove all mentions of the file from both the current repository, previous commits and all history and possible hidden files. Following this proceess may mitigate most of the risk.
+There are tutorials available online from authoritative sources like Github (i.e. https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/removing-sensitive-data-from-a-repository ) which walk through the process to explicitly remove all mentions of the file using `git filter-repo`.
 
 <ul>*Q5. A colleague runs ls -l and sees the following for a script file:*
 
@@ -372,13 +368,13 @@ The file is not a directory (no 'd' at the start of the permissions string). The
 <ul>*Q6. A new analyst joins your team. They have attempted to run a script that lives in /our_team_server/shared/run_analysis.R and they receive a Permission denied error. Explain how you would go about diagnosing and solving the issue here.*</ul>
 
 It is not clear from the question at what point the 'Permission denied' error is being returned.
-Permission denied errors in R usually refers to the user, or potentially the program from which the user is calling the script (R/RStudio or another IDE), not having appropriate permissions to access the directory containing the file, or the file specifically. If the error only occurs *during* successful execution of the script however, it may be that the code contained in `run_analysis.R` is attempting to access a file or directory in a way in which the user is not permitted to do so. Once it is established which location/file is not able to be accessed, several possible steps could be taken to pinpoint this issue:
+Permission denied errors in R usually refers to the user, or potentially the program from which the user is calling the script (R/RStudio or another IDE), not having appropriate permissions to access the directory containing the file, or the file specifically. If the error only occurs *during* successful execution of the script however, it may be that the code contained in `run_analysis.R` is attempting to access a file or directory in a way in which the user is not permitted to do so. Once it is established if it is the `run_analysis.R` file itself, or another location/file that is not able to be accessed, several possible steps could be taken to pinpoint this issue:
 
 - checking the user is signed in with their standard account which should normally have access to the file and directory. If not, logout and login as the required user.
-- checking the users's permissions for the `/our_team_server/shared` folder and the `run_analysis.R` file and ensuring they have the appropriate access permissions. Change file permissions if required.
-- checking that the user can access the file simply using another program (e.g. a text editor), to eliminate the possibility of a fault in the proram's configuration preventing access. If so, confirm the intended program is running with enough privileges to access the file.
+- checking the users's permissions for the folder and the file and ensuring they have the appropriate access permissions. Change file permissions for this user if required.
+- checking that the user can access the file using another simple program (e.g. a basic text editor like notepad), to eliminate the possibility of a fault in the program's configuration preventing access. If so, confirm the intended program is running with enough privileges to access the file.
 - ensuring another user with access to the file does not have it locked for editing. If so, ask the other user to close the file if they can be identified.
-- ensuring another process or program is not running, either locally to the user, or by another user, which has locked the file. If so, ask the user responsible for the process to either stop the process, or inform the user when it has completed and relinquished access.
+- ensuring another process or program is not running, either locally to the user, or by another user, which has locked the file. If so, ask the user responsible for the process to either stop the process, or ask them to inform the user when it has completed and relinquished access.
 
 
 

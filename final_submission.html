@@ -497,12 +497,12 @@ nominal (character) types:</p>
 <p>The standardised death rate available in this provided dataset is the
 standard reporting measure used by the ABS for reporting trends in
 Deaths (see <a href="https://www.abs.gov.au/statistics/people/population/deaths-australia/latest-release" class="uri">https://www.abs.gov.au/statistics/people/population/deaths-australia/latest-release</a>
-), which takes into account a standardised population in the reporting
-area (as at 2001). As all deaths are considered in this measure, it is
-the most appropriate to use for a general comparison over time and
-region. Figure 1 below presents the mean of all standardised death rates
-for the period 2013-2024, by ABS Remoteness Area (ARIA), for both
-Australia overall and Queensland separately.</p>
+), which takes into account a standardised baseline population in the
+reporting area (as at 2001). As all deaths are considered in this
+measure, it is the most appropriate to use for a general comparison over
+time and region. Figure 1 below presents the mean of all standardised
+death rates for the period 2013-2024, by ABS Remoteness Area (ARIA), for
+both Australia overall and Queensland separately.</p>
 <pre class="r"><code>abs_remote_long %&gt;%
     filter(state %in% c(&quot;Queensland&quot;,&quot;Australia&quot;), measure == &quot;Standardised death rate&quot;, year &gt;= 2013) %&gt;%
     ggplot(aes(x=remoteness, y=value, fill=state)) +
@@ -522,16 +522,16 @@ Remoteness, 2013-2024, Queensland and Australia</em>
 <p>There is a general pattern that standardised death rates increase as
 the level of remoteness increases, and this pattern holds true for both
 Australia as a whole and Queensland individually across the available
-data. There is not significant variation in rates contributing to each
-mean value. While death rates in more urban Remoteness Areas (Major
-Cities, Inner Regional, Outer Regional) appear to be roughly comparable
-between Queensland and Australia, the standardised death rate in Remote,
-and particularly Very Remote regions for Australia as a whole appears
-higher than the rate for Queensland. Figure 2 expands on the overall
-analysis shown in Figure 1. It presents the standardised death rates for
-both Australia and Queensland for the period 2013-2024, with the
-individual values for each Remoteness Area presented as a
-time-series.</p>
+data. There is not significant variation in rates over time which
+contribute to each mean value. While death rates in more urban
+Remoteness Areas (Major Cities, Inner Regional, Outer Regional) appear
+to be roughly comparable between Queensland and Australia, the
+standardised death rate in Remote, and particularly Very Remote regions
+for Australia as a whole appears higher than the rate for Queensland.
+Figure 2 expands on the overall analysis shown in Figure 1. It presents
+the standardised death rates for both Australia and Queensland for the
+period 2013-2024, with the individual values for each Remoteness Area
+presented as a time-series.</p>
 <pre class="r"><code>abs_remote_long %&gt;%
     filter(state %in% c(&quot;Queensland&quot;,&quot;Australia&quot;), measure == &quot;Standardised death rate&quot;, year &gt;= 2013) %&gt;%
     ggplot(aes(y=value, x=year, col=state)) +
@@ -581,24 +581,25 @@ which allow for importing xlsx formatting information, to infer data and
 dimension names directly without human intervetion.</p>
 <p>The colnames assignment should be relatively robust in general,
 though the use of a text delimiter to later split out the components may
-be more appropriately addressed by using a formal list(…) of the
-different heading levels. This would reduce the risk of the unlikely
-inclusion of the delimiter breaking the entire logic of this code
-section.</p>
+be error-prone. The managment of these different heading levels may be
+more appropriately addressed by using a formal list(…) of the nested
+headings, which can be later merged into the final long file. This would
+reduce the risk of the unlikely inclusion of the delimiter in a header
+cell breaking the entire logic of this code section.</p>
 <p>The rownames assignment likewise relies on blank/NA values in the
 content data to determine state break-points. This could easily be
 broken by the removal of white-space in the formatting of the Excel
-sheet, and the pattern in the row label’s ‘Total’ values may serve as a
-less-likely-to-break point of reference.</p>
+sheet, and using another pattern in the row label’s values may serve as
+a less-likely-to-break point of reference.</p>
 <p>The handling of all data as text initially is also a possible point
-of failure due to potential loss of precision during import. Ways to
+of failure due to potential loss of precision during import. Methods to
 import each cell of data individually without altering its content may
 be worth considering. Again, the <code>tidyxl</code> package may support
-this functionality, albeit at the cost of losing some simplicity in
-importing the data.</p>
-<p>Ultimately, looking for alternative solutions rather than working
-with poorly-structured spreadsheets may be more appropriate in the
-long-term. The ABS is now offering an API to some datasets (<a href="https://www.abs.gov.au/about/data-services/application-programming-interfaces-apis/data-api-user-guide/using-api" class="uri">https://www.abs.gov.au/about/data-services/application-programming-interfaces-apis/data-api-user-guide/using-api</a>),
+this functionality, albeit at the cost of losing some simplicity in the
+importing process.</p>
+<p>Finding alternative data-access solutions rather than working with
+poorly-structured spreadsheets may be more appropriate in the long-term.
+The ABS is now offering an API to some datasets (<a href="https://www.abs.gov.au/about/data-services/application-programming-interfaces-apis/data-api-user-guide/using-api" class="uri">https://www.abs.gov.au/about/data-services/application-programming-interfaces-apis/data-api-user-guide/using-api</a>),
 and this may be investigated to see if it is workable for this
 particular data source.</p>
 </div>
@@ -644,7 +645,7 @@ ordered:       a logical (TRUE/FALSE) value indicating if the output of the reco
     } else if(!(is.logical(ordered) &amp;&amp; length(ordered) == 1)) {
         stop(&quot;An ordered= argument of a logical (TRUE/FALSE) vector of length 1 must be provided.&quot;)
     }
-   ## output the new variable and return the modified data
+    ## output the new variable and return the modified data
     data[[outvar]] &lt;- factor(data[[var]], levels=remote_levels, ordered=ordered)
     data
 }</code></pre>
@@ -790,12 +791,12 @@ represented in the <code>patient</code> or <code>facility</code> tables.
 e.g. - reporting on rates of a rare condition by population would not
 correctly consider LGAs which have no reported cases. LGA values which
 are not frequently occurring, or which appear to not be formatted
-similarly to other values in the set, should be scrutinised to ensure
-they have been accurately recorded. Ideally, (outer) joins against an
-appropriately-sourced reference table of LGAs should be included as part
-of a workflow for any analyses using this database, so that a full and
-accurate set of LGAs which could possibly be represented are
-considered.</p>
+similarly to other values in the database, should be scrutinised to
+ensure they have been accurately recorded. Ideally, (outer) joins
+against an appropriately-sourced reference table of LGAs should be
+included as part of a workflow for any analyses using this database, so
+that a full and accurate set of LGAs which could possibly be represented
+are considered.</p>
 <ul>
 <em>Q2. An epidemiologist who runs queries against this database to
 filter admissions by admission_date reports to you that her queries are
@@ -858,9 +859,9 @@ table, or actual facilities that may not be represented in the facility
 table for whatever reason (e.g. an out of date reference table).</p>
 <p>Once a satisfactory join can be establised between the
 <code>admission</code> and <code>facility</code> tables, a simple count
-can be selected where the <code>admission.admission_date</code> occurred
-in 2023, and the associated <code>facility.remoteness</code> was ‘Very
-Remote.’</p>
+query can be executed where the <code>admission.admission_date</code>
+occurred in 2023, and the associated <code>facility.remoteness</code>
+was ‘Very Remote.’</p>
 </div>
 <div id="task-four-git-bash-sysadmin" class="section level2">
 <h2>TASK FOUR – Git / Bash / SysAdmin</h2>
@@ -878,12 +879,12 @@ happens?</em>
 </ul>
 <p>The <code>new_file.csv</code> file which is not being tracked for
 version control will be ignored entirely, as it is not part of the git
-repository at all. The modified <code>R/clean.R</code> file, which
-appears to be the target of the <code>git commit</code> call, given the
-related <code>&quot;update cleaning script&quot;</code> commit message, will not
-have its changes committed to the git repository. Other changes which
-were staged for commit may be committed to the repository (though it
-looks like there are none currently), but not the intended file.</p>
+repository. The modified <code>R/clean.R</code> file, which appears to
+be the target of the <code>git commit</code> call, given the related
+<code>&quot;update cleaning script&quot;</code> commit message, will not have its
+changes committed to the git repository. Other changes which were staged
+for commit may be committed to the repository (though it looks like
+there are none currently), but not the intended file.</p>
 <ul>
 <em>Q2. You are on branch feature/new-plot and run git merge main. Git
 reports a merge conflict in the script R/analysis.R. What is the the
@@ -903,47 +904,43 @@ branching and pull request workflow you would follow to add a new
 feature (e.g. a new visualisation function in R/plots.R) without
 disrupting your colleagues’ work on main.</em>
 </ul>
-<p>A typicaly workflow for this scenario would be: - make a new
+<p>A typical workflow for this scenario would be: - make a new
 <code>working</code> branch to hold the code to be edited for R/plots.R
-- fetch and merge the existing code from <code>main</code> into the
+- pull the existing code from <code>main</code> into the
 <code>working</code> branch so you have a clean, up-to-date and agreed
 codebase to build upon. - make changes to the <code>working</code>
 branch code and commit them regularly to the <code>working</code>
-branch. - repeat the fetch and merge from <code>main</code> regularly to
-ensure any code conflicts can be resolved while developing. - when
-significant work has been undertaken and the local <code>working</code>
-code is ready to be potentially merged back to <code>main</code>, push
-the <code>working</code> branch back to the remote repository - raise a
-pull request so that the <code>working</code> branch code can be
-reviewed by the other team members before being rejected, returned for
-further editing, or merged into the <code>main</code> branch</p>
+branch. - repeat the pull from <code>main</code> regularly to ensure any
+code conflicts can be resolved while developing. - when significant work
+has been undertaken and the local <code>working</code> code is ready to
+be potentially merged back to <code>main</code>, push the
+<code>working</code> branch back to the remote repository - raise a pull
+request so that the <code>working</code> branch code can be reviewed by
+the other team members before being rejected, returned for further
+editing, or ultimately merged into the <code>main</code> branch</p>
 <ul>
 <em>Q4. A colleague has accidentally committed a file containing a
 database password (config/db_credentials.R) and pushed it to the remote
 main branch. Describe the steps you would take to remediate this
 situation.</em>
 </ul>
-<p>I am not confident outlining a full solution to this problem that
-would 100% resolve security concerns. I would first consider any
-associated credentials included in <code>db_credentials.R</code> to be
-potentially compromised, and arrange to change all passwords. Then I
-would take a full local <code>git clone</code> backup of the remote
-repository (possibly stored in several locations) to ensure no data is
-lost. All members of the team who may be currently working on code to
-eventually be integrated to the <code>main</code> branch should be
-notified to temporarily pause any planned code merges, to prevent
-possible future issues. I understand that simply removing the file and
-pushing the changes to the remote main branch would only obscure the
-credentials within the commit history of the remote repository, and a
-wider-ranging response would be required. From my research, the git
-project explicitly recommends using <code>git filter-repo</code> as
-listed here on the official documentation - <a href="https://git-scm.com/docs/git-filter-branch#_warning" class="uri">https://git-scm.com/docs/git-filter-branch#_warning</a>
-.</p>
-<p>There are tutorials available online ( <a href="https://www.tutorialpedia.org/blog/how-to-remove-file-from-git-history/" class="uri">https://www.tutorialpedia.org/blog/how-to-remove-file-from-git-history/</a>
+<p>If the remote branch is accessible by many users, I would consider
+any associated credentials included in <code>db_credentials.R</code> to
+be potentially compromised, and arrange to change all passwords. A full
+local <code>git clone</code> backup of the remote repository should be
+made to ensure no data is lost from resolving the issue. All members of
+the team who may be currently working on code to eventually be
+integrated to the <code>main</code> branch should be notified to
+temporarily pause any planned code merges, to prevent further issues. As
+simply removing the file and pushing the changes to the remote main
+branch would only obscure the credentials within the commit history of
+the remote repository, a wider-ranging response would be required. The
+Git maintainers and Github both recommend using
+<code>git filter-repo</code>.</p>
+<p>There are tutorials available online from authoritative sources like
+Github (i.e. <a href="https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/removing-sensitive-data-from-a-repository" class="uri">https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/removing-sensitive-data-from-a-repository</a>
 ) which walk through the process to explicitly remove all mentions of
-the file from both the current repository, previous commits and all
-history and possible hidden files. Following this proceess may mitigate
-most of the risk.</p>
+the file using <code>git filter-repo</code>.</p>
 <ul>
 <p><em>Q5. A colleague runs ls -l and sees the following for a script
 file:</em></p>
@@ -971,28 +968,29 @@ specifically. If the error only occurs <em>during</em> successful
 execution of the script however, it may be that the code contained in
 <code>run_analysis.R</code> is attempting to access a file or directory
 in a way in which the user is not permitted to do so. Once it is
-established which location/file is not able to be accessed, several
-possible steps could be taken to pinpoint this issue:</p>
+established if it is the <code>run_analysis.R</code> file itself, or
+another location/file that is not able to be accessed, several possible
+steps could be taken to pinpoint this issue:</p>
 <ul>
 <li>checking the user is signed in with their standard account which
 should normally have access to the file and directory. If not, logout
 and login as the required user.</li>
-<li>checking the users’s permissions for the
-<code>/our_team_server/shared</code> folder and the
-<code>run_analysis.R</code> file and ensuring they have the appropriate
-access permissions. Change file permissions if required.</li>
-<li>checking that the user can access the file simply using another
-program (e.g. a text editor), to eliminate the possibility of a fault in
-the proram’s configuration preventing access. If so, confirm the
-intended program is running with enough privileges to access the
-file.</li>
+<li>checking the users’s permissions for the folder and the file and
+ensuring they have the appropriate access permissions. Change file
+permissions for this user if required.</li>
+<li>checking that the user can access the file using another simple
+program (e.g. a basic text editor like notepad), to eliminate the
+possibility of a fault in the program’s configuration preventing access.
+If so, confirm the intended program is running with enough privileges to
+access the file.</li>
 <li>ensuring another user with access to the file does not have it
 locked for editing. If so, ask the other user to close the file if they
 can be identified.</li>
 <li>ensuring another process or program is not running, either locally
 to the user, or by another user, which has locked the file. If so, ask
-the user responsible for the process to either stop the process, or
-inform the user when it has completed and relinquished access.</li>
+the user responsible for the process to either stop the process, or ask
+them to inform the user when it has completed and relinquished
+access.</li>
 </ul>
 </div>
 
