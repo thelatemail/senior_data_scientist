@@ -478,7 +478,7 @@ abs_remote_long &lt;- abs_remote %&gt;%
     mutate(remoteness = ordered(remoteness, levels=remoteness_levels_ordered))
 
 ## write out the final csv file
-write.csv(abs_remote_long, &quot;abs_deaths_remoteness_2011_2024.csv&quot;, row.names=FALSE)</code></pre>
+write.csv(abs_remote_long, &quot;../output/abs_deaths_remoteness_2011_2024.csv&quot;, row.names=FALSE)</code></pre>
 <p>This produces a cleaned, long-form (‘tidy’) dataset, as shown in the
 below sample, with correct variable types for numeric, ordinal and
 nominal (character) types:</p>
