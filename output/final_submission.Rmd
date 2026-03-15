@@ -343,6 +343,7 @@ Merging the `main` branch against the working `new-plot` branch will attempt to 
 <ul>*Q3. You are one of three data scientists collaborating on an analytical pipeline in a shared GitHub repository. Describe the branching and pull request workflow you would follow to add a new feature (e.g. a new visualisation function in R/plots.R) without disrupting your colleagues’ work on main.*</ul>
 
 A typical workflow for this scenario would be:
+
 - make a new `working` branch to hold the code to be edited for R/plots.R
 - pull the existing code from `main` into the `working` branch so you have a clean, up-to-date and agreed codebase to build upon.
 - make changes to the `working` branch code and commit them regularly to the `working` branch.
