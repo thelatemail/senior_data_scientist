@@ -25,7 +25,7 @@ library(ggplot2)
 
 ## variables for simplifying following import script
 ## file name
-abs_file <- "input/ABS_death_australia_remotenessareas.xlsx"
+abs_file <- "../input/ABS_death_australia_remotenessareas.xlsx"
 ## sheet name
 sheet_name <- "Table 1"
 ### cell range of column header rows
@@ -94,7 +94,7 @@ abs_remote_long <- abs_remote %>%
     mutate(remoteness = ordered(remoteness, levels=remoteness_levels_ordered))
 
 ## write out the final csv file
-write.csv(abs_remote_long, "output/abs_deaths_remoteness_2011_2024.csv", row.names=FALSE)
+write.csv(abs_remote_long, "abs_deaths_remoteness_2011_2024.csv", row.names=FALSE)
 ```
 
 This produces a cleaned, long-form ('tidy') dataset, as shown in the below sample, with correct variable types for numeric, ordinal and nominal (character) types:
@@ -289,7 +289,7 @@ remote_to_factor_data(data = abs_remote_long, var = "remoteness", outvar = "remo
 ## TASK THREE – Databases / SQL
 
 ```{r , echo=FALSE, out.width = 604}
-knitr::include_graphics("input/health_db_schema.jpg")
+knitr::include_graphics("../input/health_db_schema.jpg")
 ```
 
 
