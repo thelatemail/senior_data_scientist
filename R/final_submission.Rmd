@@ -97,44 +97,16 @@ abs_remote_long <- abs_remote %>%
 write.csv(abs_remote_long, "../output/abs_deaths_remoteness_2011_2024.csv", row.names=FALSE)
 ```
 
-This produces a cleaned, long-form ('tidy') dataset, as shown in the below sample, with correct variable types for numeric, ordinal and nominal (character) types:
+This produces a cleaned, long-form ('tidy') dataset, as shown in the below sample:
 
 ```{r}
 head(abs_remote_long)
 ```
 
-### Interpretation
+### Report
 
-The standardised death rate available in this provided dataset is the standard reporting measure used by the ABS for reporting trends in Deaths (see https://www.abs.gov.au/statistics/people/population/deaths-australia/latest-release ), which takes into account a standardised baseline population in the reporting area (as at 2001). As all deaths are considered in this measure, it is the most appropriate to use for a general comparison over time and region. Figure 1 below presents the mean of all standardised death rates for the period 2013-2024, by ABS Remoteness Area (ARIA), for both Australia overall and Queensland separately.
+See the `output/deaths_qld_australia.html` html report generated from the `R/report.Rmd` markdown document.
 
-```{r, fig.dim=c(8, 4), fig.cap="***Figure 1***: *Mean Standardised Death Rate by Remoteness, 2013-2024, Queensland and Australia*"}
-abs_remote_long %>%
-    filter(state %in% c("Queensland","Australia"), measure == "Standardised death rate", year >= 2013) %>%
-    ggplot(aes(x=remoteness, y=value, fill=state)) +
-    stat_summary(fun="mean", geom="col", width=0.7, position=position_dodge()) +
-    stat_summary(fun.data = mean_se, geom = "errorbar", width=0.5, position=position_dodge(width=0.7)) +
-    xlab("Remoteness") +
-    ylab("Mean Standardised Death Rate") +
-    labs(fill="Region") +
-    theme_bw()
-```
-
-There is a general pattern that standardised death rates increase as the level of remoteness increases, and this pattern holds true for both Australia as a whole and Queensland individually across the available data. There is not significant variation in rates over time which contribute to each mean value. While death rates in more urban Remoteness Areas (Major Cities, Inner Regional, Outer Regional) appear to be roughly comparable between Queensland and Australia, the standardised death rate in Remote, and particularly Very Remote regions for Australia as a whole appears higher than the rate for Queensland. Figure 2 expands on the overall analysis shown in Figure 1. It presents the standardised death rates for both Australia and Queensland for the period 2013-2024, with the individual values for each Remoteness Area presented as a time-series. 
-
-```{r, fig.dim=c(10,5), fig.cap="***Figure 2***: *Standardised Death Rate by Remoteness and Year, 2013-2024, Queensland and Australia*"}
-abs_remote_long %>%
-    filter(state %in% c("Queensland","Australia"), measure == "Standardised death rate", year >= 2013) %>%
-    ggplot(aes(y=value, x=year, col=state)) +
-    geom_line() +
-    facet_grid(cols=vars(remoteness)) +
-    xlab("Year") +
-    ylab("Standardised Death Rate") +
-    scale_x_continuous(breaks=c(2013:max(abs_remote_long$year))) +
-    labs(col="Region") +
-    theme_bw() +
-    theme(legend.position="bottom", axis.text.x = element_text(angle = 90))
-```
-Figure 2 confirms the consistency of the pattern from Figure 1 that standardised death rates increase as remoteness increases, despite some variation from year-to-year within each Remotness Area. As with Figure 1, the temporal trends in standardised death rates track similarly across the available data for Major Cities, Inner Regional and Outer Regional areas. The rate for Australia as a whole was consistently higher in the earlier years from 2013-2015 in the Remote region, but has been comparable since. Picking up on the key finding from Figure 1, it can be seen that the standardised death rate in the Very Remote region for Australia as a whole diverged from that of Queensland in 2016, and has remained consistently higher through to 2024. This appears to be driven by a consitent decrease in the standardised death rate in Queensland from 2013-2024 while the rate for Australia as a whole has fluctuated around the 2013 value across the same period.
 
 ### Reflection Question
 
